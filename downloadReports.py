@@ -2,7 +2,7 @@ from playwright.async_api import Playwright, async_playwright, Error
 import asyncio
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from encryptPass import password
+from encryptPass import password, user, url, company
 import os
 
 

@@ -72,7 +72,7 @@ def create_password():
 
 def load_password() -> str:
     # Load the encryption key (if stored separately)
-    with open(data_folder + key_filename, "rb") as key_file:
+    with open(data_folder + password_key_filename, "rb") as key_file:
         saved_key = key_file.read()
     # Recreate the Fernet object using the saved key
     f = Fernet(saved_key)
