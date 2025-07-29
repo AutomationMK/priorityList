@@ -1,4 +1,7 @@
 import os
+import shutil
+import glob
+import sys
 import datetime
 import pandas as pd
 import numpy as np
@@ -9,6 +12,47 @@ from openpyxl.utils.cell import get_column_letter
 from openpyxl.formatting.rule import CellIsRule
 from downloadReports import download_reports
 
+
+# check if the os is windows or linux and handle the filesystem based on that info
+os_type = sys.platform
+if os_type == "win32":
+    priority_list_path = glob.glob(
+        "L:\\Quotes\\Back Order Priority List\\priorityList*.xlsx"
+    )
+    quote_scan_folder = "L:\\Quotes\\Back Order Priority List\\"
+elif os_type == "linux":
+    priority_list_path = glob.glob(
+        "/mnt/l/Quotes/Back Order Priority List/priorityList*.xlsx"
+    )
+    quote_scan_folder = "/mnt/l/Quotes/Back Order Priority List/"
+else:
+    print(f"Error: this program is not designed for os type {os_type}")
+    exit(1)
+
+# check if the correct amount of excel files in the back order priority list folder is 1
+# if it is not 1 then it will report an error and end the program
+if len(priority_list_path) > 1:
+    print("Error: you cannot have more than one excel file in this folder")
+    exit(1)
+elif len(priority_list_path) == 0:
+    print("Warning: No files found in the quote scans folder")
+    print("The older priorityList file will be used instead if that is available")
+    print("If this was an accident find a backup version of the file if it exists")
+    print(
+        "Then you can re-run the program to generate a correct file with all of the newer ship dates"
+    )
+else:
+    # move the priorityList file to the local folder to be used by the program
+    source = os.path.abspath(priority_list_path[0])
+    dest = os.path.relpath("./priorityList.xlsx")
+    try:
+        shutil.move(source, dest)
+    except FileNotFoundError:
+        print(f"Error: Source file {source} not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# open E2 and download the needed reports
 try:
     download_reports()
 except Exception as e:
@@ -16,7 +60,7 @@ except Exception as e:
     exit()
 
 data_folder = os.path.abspath(".") + "/csv_files"
-# file location for excel file used
+# check if excel file location for excel file used is available
 originalFile = "priorityList.xlsx"
 # file location for Job information (assuming it is local)
 scheduleLoc = f"{data_folder}/Job Schedule - Detail Report.csv"
@@ -156,13 +200,6 @@ podf = pd.read_csv(
     parse_dates=[oldPoDate, oldPoDueDate],
     date_format="%m/%d/%Y",
 )
-oldDf = pd.read_excel(
-    originalFile,
-    sheet_name="Priority List",
-    index_col=jobNum,
-    dtype="string",
-    parse_dates=[estShip, estShipPrev, estShipPrev2],
-)
 orderdf = pd.read_csv(
     orderLoc,
     index_col=oldJobNum,
@@ -172,7 +209,6 @@ orderdf = pd.read_csv(
 )
 # remove unused columns
 df = df.drop(columns=dropSchedCol)
-oldDf = oldDf.drop(columns=dropOldCol)
 podf = podf.drop(columns=dropPoCol)
 orderdf = orderdf.drop(columns=dropOrdCol)
 # rename to more defined user names
@@ -248,18 +284,35 @@ df[workCode] = df[workCode].astype("string")
 podf[poLink] = pd.NA
 podf[poLink] = podf[poLink].astype("string")
 
-oldDf = oldDf.drop(index=oldDf.index.difference(df.index))
+# if there is a priorityList.xlsx file to use
+if os.path.exists(originalFile):
+    oldDf = pd.read_excel(
+        originalFile,
+        sheet_name="Priority List",
+        index_col=jobNum,
+        dtype="string",
+        parse_dates=[estShip, estShipPrev, estShipPrev2],
+    )
+    oldDf = oldDf.drop(columns=dropOldCol)
+    oldDf = oldDf.drop(index=oldDf.index.difference(df.index))
+    for index, value in oldDf[estShipPrev2].items():
+        df.loc[index, estShipPrev2] = value
+    for index, value in oldDf[estShipPrev].items():
+        df.loc[index, estShipPrev] = value
+    for index, value in oldDf[estShip].items():
+        df.loc[index, estShip] = value
+    for index, value in oldDf[notes].items():
+        df.loc[index, notes] = value
+else:
+    print(
+        "Warning: there is no priorityList.xlsx file or a Back Order Priority List folder file to take ship dates from!"
+    )
+    print("A new file will be generated with an empty ship date section")
+    print("If this was an accident then please find a backup of the file")
+
 orderdf = orderdf.drop(index=orderdf.index.difference(df.index))
 podf = podf.drop(index=podf.index.difference(df.index))
 
-for index, value in oldDf[estShipPrev2].items():
-    df.loc[index, estShipPrev2] = value
-for index, value in oldDf[estShipPrev].items():
-    df.loc[index, estShipPrev] = value
-for index, value in oldDf[estShip].items():
-    df.loc[index, estShip] = value
-for index, value in oldDf[notes].items():
-    df.loc[index, notes] = value
 for index, value in orderdf[oldWorkCode].items():
     df.loc[index, workCode] = value
 for index, value in orderdf[oldOrdDate].items():
@@ -508,4 +561,16 @@ filterRangePo = "A1:" + toLetter(poQtyRej, podf) + str(lastRow)
 ws.auto_filter.ref = filterRangeMain
 wspo.auto_filter.ref = filterRangePo
 
+# save a version of the final file locally
 wb.save(newFile)
+
+
+# take the locally generated file and apply it to the quote scans folder
+final_source = os.path.relpath(f"./{newFile}")
+final_dest = os.path.abspath(f"{quote_scan_folder}{newFile}")
+try:
+    shutil.move(final_source, final_dest)
+except FileNotFoundError:
+    print(f"Error: Source file {final_source} not found.")
+except Exception as e:
+    print(f"An error occurred: {e}")

@@ -3,9 +3,8 @@
 ## Description
 
 This is a simple project to generate the excel file for daily open jobs.
-Users need to add the old priorityList.xlsx edited file to the main folder.
-Make sure that the date info is removed and only priorityList.xlsx is the name.
-If not the program will not work correctly and will generate based on the old list in the folder.
+An excel file from previously made jobs needs to be available if not all old
+ship dates given will no longer be included in the list and a new blank file will be generated.
 
 ## Getting Started
 
@@ -19,14 +18,9 @@ If not the program will not work correctly and will generate based on the old li
 
 ### Installing
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
-
-### Executing program
-* The program needs to be executed in the main project folder
+* All actions need to be executed in the main project folder of running from command line
 * The program also needs it's virtual environment activated
-* pip will need to be ran for installing any dependencies in the
-requirements.txt file
+* pip will need to be ran for installing any dependencies in the requirements.txt file
 
 Example running on Linux...
 
@@ -47,15 +41,19 @@ pip install -r requirements.txt
 playwright install chromium
 deactivate
 ```
+
 A powershell script is included for both install and run
 and you just need to right click and run the program to install
 The IT departmen might need to give you the ability to
 run the program at first but after you can run as many times as
 you want without permission.
 
-* Finally run the program by main.py from the main project folder
-Example running on Linux...
+### Executing The Program
 
+* Finally run the program by main.py from the main project folder
+* You need to activate the python virtual environment
+
+Example running on Linux...
 ```bash
 # in the main project folder as the working directory
 source venv/bin/activate
