@@ -1,7 +1,9 @@
 import os
 from cryptography.fernet import Fernet
+from getpass import getpass
 
-data_folder = os.path.abspath("data/password/")
+home_dir = os.path.dirname(os.path.abspath(__file__))
+data_folder = home_dir + "/data/password"
 password_binary_filename = "/pass.bin"
 password_key_filename = "/pass.key"
 user_binary_filename = "/user.bin"
@@ -54,12 +56,13 @@ def user(folder_location=data_folder):
         user = load_user()
     return user
 
+
 def create_password():
     # Generate a key and instantiate a Fernet instance
     key = Fernet.generate_key()
     f = Fernet(key)
     # The password you want to encrypt
-    password = input("Enter a password: ")
+    password = getpass("Enter a password: ")
     # Encrypt the password (it must be encoded to bytes)
     encrypted_password = f.encrypt(password.encode())
     # Save the encrypted password to a file

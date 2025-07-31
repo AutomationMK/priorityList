@@ -5,7 +5,7 @@ if [[ ! -d $(pwd)/venv ]]; then
 fi
 
 source $(pwd)/venv/bin/activate
-pip install -r requirements.txt
+pip install -r $(pwd)/requirements.txt
 playwright install chromium
 deactivate
 
@@ -17,7 +17,7 @@ pathadd() {
   fi
 }
 
-if [ ! -d ~/bin ]; then
+if [[ ! -d ~/bin ]]; then
   mkdir ~/bin
   pathadd ~/bin
   echo "export PATH='$PATH'" >> ~/.bashrc
@@ -25,8 +25,8 @@ if [ ! -d ~/bin ]; then
 fi
 
 if [[ ! -f $CMD ]]; then
-  ln -s $(pwd)/run.sh ~/bin/$CMD
-  chmod +x ~/bin/$CMD
+  ln -s $(pwd)/run.sh $CMD
+  chmod +x $CMD
 fi
   
 read -p "Press Enter to close the window..."

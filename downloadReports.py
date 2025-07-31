@@ -73,9 +73,8 @@ async def download_csv(page, data_folder):
             await page.get_by_role("link", name="Export as... ").click()
             await page.get_by_role("link", name="CSV").click()
         download = await download_info.value
-        downloadName = (
-            os.path.abspath(".") + f"/{data_folder}/" + download.suggested_filename
-        )
+        home_dir = os.path.dirname(os.path.abspath(__file__))
+        downloadName = home_dir + f"/{data_folder}/" + download.suggested_filename
         await download.save_as(downloadName)
         await page.get_by_role("button", name=" Close").click()
     except Error as e:

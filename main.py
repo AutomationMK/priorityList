@@ -12,6 +12,7 @@ from openpyxl.utils.cell import get_column_letter
 from openpyxl.formatting.rule import CellIsRule
 from downloadReports import download_reports
 
+home_dir = os.path.dirname(os.path.abspath(__file__))
 
 # check if the os is windows or linux and handle the filesystem based on that info
 os_type = sys.platform
@@ -44,7 +45,7 @@ elif len(priority_list_path) == 0:
 else:
     # move the priorityList file to the local folder to be used by the program
     source = os.path.abspath(priority_list_path[0])
-    dest = os.path.relpath("./priorityList.xlsx")
+    dest = home_dir + "/priorityList.xlsx"
     try:
         shutil.move(source, dest)
     except FileNotFoundError:
@@ -59,7 +60,7 @@ except Exception as e:
     print(e)
     exit()
 
-data_folder = os.path.abspath(".") + "/csv_files"
+data_folder = home_dir + "/csv_files"
 # check if excel file location for excel file used is available
 originalFile = "priorityList.xlsx"
 # file location for Job information (assuming it is local)
@@ -570,7 +571,7 @@ wb.save(newFile)
 
 
 # take the locally generated file and apply it to the quote scans folder
-final_source = os.path.relpath(f"./{newFile}")
+final_source = home_dir + "/{newFile}"
 final_dest = os.path.abspath(f"{quote_scan_folder}{newFile}")
 try:
     shutil.move(final_source, final_dest)
