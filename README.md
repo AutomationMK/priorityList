@@ -14,7 +14,7 @@ ship dates given will no longer be included in the list and a new blank file wil
 * pandas version(2.2.3)
 * numpy version(1.26.4)
 * openpyxl version(3.1.3)
-* WSL (Windows Subsystem For Linux), Windows Powershell or any Linux Distrobution
+* WSL (Windows Subsystem For Linux) or any linux distribution
 
 ### Installing
 
@@ -33,21 +33,6 @@ playwright install chromium
 deactivate
 ```
 
-Example running in windows powershell...
-```powercode
-python -m venv venv
-.\venv\Scripts\activate.ps1
-pip install -r requirements.txt
-playwright install chromium
-deactivate
-```
-
-A powershell script is included for both install and run
-and you just need to right click and run the program to install
-The IT departmen might need to give you the ability to
-run the program at first but after you can run as many times as
-you want without permission.
-
 ### Executing The Program
 
 * Finally run the program by main.py from the main project folder
@@ -57,13 +42,6 @@ Example running on Linux...
 ```bash
 # in the main project folder as the working directory
 source venv/bin/activate
-python main.py
-deactivate
-```
-
-Example running in windows powershell...
-```powercode
-.\venv\Scripts\activate.ps1
 python main.py
 deactivate
 ```

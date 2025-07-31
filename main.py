@@ -316,7 +316,11 @@ podf = podf.drop(index=podf.index.difference(df.index))
 for index, value in orderdf[oldWorkCode].items():
     df.loc[index, workCode] = value
 for index, value in orderdf[oldOrdDate].items():
-    df.loc[index, ordDate] = value
+    try:
+        df.loc[index, ordDate] = value
+    except Exception as e:
+        print(f"Error on {index}: {e}")
+
 
 df = df.reindex(columns=dfColumns)
 
