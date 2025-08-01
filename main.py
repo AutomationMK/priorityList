@@ -62,7 +62,7 @@ except Exception as e:
 
 data_folder = home_dir + "/csv_files"
 # check if excel file location for excel file used is available
-originalFile = "priorityList.xlsx"
+originalFile = home_dir + "/priorityList.xlsx"
 # file location for Job information (assuming it is local)
 scheduleLoc = f"{data_folder}/Job Schedule - Detail Report.csv"
 # file location for PO information (assuming it is local)
@@ -334,12 +334,12 @@ podf = podf.sort_index()
 priWorksheet = "Priority List"
 poWorksheet = "PO List"
 
-writer = pd.ExcelWriter(newFile)
+writer = pd.ExcelWriter(home_dir + "/" + newFile)
 df.to_excel(writer, sheet_name=priWorksheet)
 podf.to_excel(writer, sheet_name=poWorksheet)
 writer.close()
 
-wb = load_workbook(filename=newFile)
+wb = load_workbook(filename=home_dir + "/" + newFile)
 ws = wb.active
 wspo = wb[poWorksheet]
 
@@ -567,11 +567,11 @@ ws.auto_filter.ref = filterRangeMain
 wspo.auto_filter.ref = filterRangePo
 
 # save a version of the final file locally
-wb.save(newFile)
+wb.save(home_dir + "/" + newFile)
 
 
 # take the locally generated file and apply it to the quote scans folder
-final_source = home_dir + "/{newFile}"
+final_source = os.path.abspath(home_dir + "/" + newFile)
 final_dest = os.path.abspath(f"{quote_scan_folder}{newFile}")
 try:
     shutil.move(final_source, final_dest)
